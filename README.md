@@ -24,25 +24,95 @@ This whiteboard is lightweight, easy to use, and offers a smooth interactive can
 
 ## 🛠️ Tech Stack
 
-| Layer         | Technologies Used                          |
-|---------------|---------------------------------------------|
-| Frontend      | React.js, Next.js, Tailwind CSS, HTML5 Canvas |
-| State/UI      | Recoil, Framer Motion                       |
-| Backend       | Node.js, Express, Socket.IO                 |                                    |
-| Auth (Mocked) | JWT-ready structure                         |
-| Hosting       | Vercel (Frontend)         |
+| Layer         | Technologies Used                                   |
+|---------------|-----------------------------------------------------|
+| Frontend      | React.js, Next.js, Tailwind CSS, HTML5 Canvas       |
+| State/UI      | Recoil, Framer Motion                               |
+| Backend       | Node.js, Express, Socket.IO                         |
+| Auth (Mocked) | JWT-ready structure                                 |
+| Hosting       | Vercel (Frontend)                                   |
+| Database      | Local in-memory (default). Optionally, you can use Firebase, AWS, or any cloud database for global data persistence. See below for setup instructions. |
 
 ---
 
+**Note:**  
+By default, all whiteboard  data is stored locally in memory on the backend server (not persisted after restart).  
+If you want to store data globally and persistently, you can easily integrate a cloud database such as Firebase, AWS DynamoDB, MongoDB Atlas, or deploy your own database on platforms like Render.  
+Instructions for integrating Firebase are provided below, but you can use any database solution that fits
+
+---
+
+### 🔗 Optional: Using Firebase as a Database
+
+By default, this project does **not** use a database.  
+If you want to persist whiteboard changes or user data, you can integrate [Firebase](https://firebase.google.com/):
+
+1. **Create a Firebase Project:**  
+   Go to [Firebase Console](https://console.firebase.google.com/), create a new project, and add a web app.
+
+2. **Install Firebase SDK:**  
+   ```bash
+   npm install firebase
+   ```
+
+3. **Configure Firebase:**  
+   Add your Firebase config to your project (e.g., in `firebaseConfig.js`):
+
+   ```js
+   // firebaseConfig.js
+   import { initializeApp } from "firebase/app";
+   const firebaseConfig = {
+     apiKey: "YOUR_API_KEY",
+     authDomain: "YOUR_AUTH_DOMAIN",
+     projectId: "YOUR_PROJECT_ID",
+     storageBucket: "YOUR_STORAGE_BUCKET",
+     messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+     appId: "YOUR_APP_ID"
+   };
+   export const app = initializeApp(firebaseConfig);
+   ```
+
+4. **Use Firestore or Realtime Database:**  
+   Import and use Firestore or Realtime Database in your app to store and sync whiteboard data.
+
+5. **Update Code:**  
+   Replace in-memory storage with Firebase calls wherever you want to persist or sync data.
+
+**Note:**  
+Firebase setup is optional and not included in the default
+
+---
 ## 🧪 Running Locally (Development Setup)
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/whiteboard.git
-cd whiteboard
-npm install 
+git clone https://github.com/Lucifer77799/digiboard_mars_open_project-.git
+```
+This command downloads the project code from GitHub to your computer.
+
+```bash
+cd digiboard
+```
+Change directory to the folder where the repository was cloned.  
+**Note:** If your folder has a different name, replace `digiboard` with your actual folder name.
+
+```bash
+npm install
+```
+Installs all required dependencies for the project.
+
+```bash
 npm install --save-dev nodemon
 npm install --save-dev ts-node typescript
-npm run dev
+```
+Installs development tools:  
+- `nodemon` for automatic server restarts on code changes  
+- `ts-node` and `typescript` for running TypeScript code
 
+```bash
+npm run dev
+```
+Starts the development server. The app will be available locally (at `http://localhost:3000`).
+
+---
