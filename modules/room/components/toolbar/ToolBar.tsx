@@ -5,6 +5,7 @@ import { FiChevronRight } from "react-icons/fi";
 import { HiOutlineDownload } from "react-icons/hi";
 import { IoIosShareAlt } from "react-icons/io";
 import { ImExit } from "react-icons/im";
+import { FaFont } from "react-icons/fa";
 
 import { useRefs } from "../../hooks/useRefs";
 import ShareModal from "../../modals/ShareModal";
@@ -28,6 +29,10 @@ const ToolBar = () => {
   const { canvasRef, bgRef } = useRefs();
 
   const [opened, setOpened] = useState(false);
+  const [showTextInput, setShowTextInput] = useState(false);
+  const [textValue, setTextValue] = useState("");
+  const [textPos, setTextPos] = useState<{ x: number; y: number } | null>(null);
+  const [textMode, setTextMode] = useState(false);
 
   useEffect(() => {
     setOpened(width >= 1024);
@@ -53,6 +58,49 @@ const ToolBar = () => {
   const handleExit = () => router.push("/");
   const handleShare = () => openModal(<ShareModal />);
 
+  // --- Text Tool handlers ---
+  const handleTextToolClick = () => {
+    setTextMode((v) => !v);
+    setShowTextInput(false);
+    setTextPos(null);
+  };
+
+  // Listen for canvas clicks when text mode is active
+  useEffect(() => {
+    if (!textMode || !canvasRef.current) return;
+
+    const handleCanvasClick = (e: MouseEvent) => {
+      const rect = canvasRef.current!.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      setTextPos({ x, y });
+      setShowTextInput(true);
+    };
+
+    const canvas = canvasRef.current;
+    canvas.addEventListener("click", handleCanvasClick);
+
+    return () => {
+      canvas.removeEventListener("click", handleCanvasClick);
+    };
+  }, [textMode, canvasRef]);
+
+  const handleTextSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (canvasRef.current && textPos) {
+      const ctx = canvasRef.current.getContext("2d");
+      if (ctx) {
+        ctx.font = "24px sans-serif";
+        ctx.fillStyle = "#000"; // Black by default
+        ctx.fillText(textValue, textPos.x, textPos.y);
+      }
+    }
+    setShowTextInput(false);
+    setTextValue("");
+    setTextPos(null);
+    setTextMode(false);
+  };
+
   return (
     <>
       <motion.button
@@ -73,6 +121,16 @@ const ToolBar = () => {
         <GroupLabel label="Tools">
           <Tool title="Drawing Mode"><ModePicker /></Tool>
           <Tool title="Shapes"><ShapeSelector /></Tool>
+          {/* --- Text Tool Button --- */}
+          <Tool title="Text Tool">
+            <button
+              className={`btn-icon ${textMode ? "bg-white/20" : ""}`}
+              onClick={handleTextToolClick}
+              title="Text Tool"
+            >
+              <FaFont />
+            </button>
+          </Tool>
         </GroupLabel>
 
         <GroupLabel label="Styles">
@@ -101,6 +159,38 @@ const ToolBar = () => {
           </IconButton>
         </GroupLabel>
       </motion.div>
+
+      {/* --- Text Input Overlay at chosen position --- */}
+      {showTextInput && textPos && (
+        <form
+          onSubmit={handleTextSubmit}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40"
+          style={{ pointerEvents: "auto" }}
+        >
+          <input
+            autoFocus
+            type="text"
+            value={textValue}
+            onChange={(e) => setTextValue(e.target.value)}
+            placeholder="Enter text to add to canvas"
+            className="rounded-lg border px-4 py-2 text-black"
+            style={{
+              position: "absolute",
+              left: textPos.x + (canvasRef.current?.getBoundingClientRect().left || 0),
+              top: textPos.y + (canvasRef.current?.getBoundingClientRect().top || 0),
+              transform: "translate(-50%, -50%)",
+              zIndex: 200,
+            }}
+          />
+          <button
+            type="submit"
+            className="ml-2 rounded bg-indigo-600 px-4 py-2 text-white"
+            style={{ position: "absolute", left: -9999 }} // Hide button, submit with Enter
+          >
+            Add
+          </button>
+        </form>
+      )}
     </>
   );
 };
@@ -151,4 +241,4 @@ const GroupLabel = ({
     </p>
     <div className="flex flex-wrap items-center gap-3">{children}</div>
   </div>
-);
+    );
