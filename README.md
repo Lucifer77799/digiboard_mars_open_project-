@@ -37,7 +37,9 @@ This whiteboard is lightweight, easy to use, and offers a smooth interactive can
 
 **Note:**  
 By default, all whiteboard  data is stored locally in memory on the backend server (not persisted after restart).  
-If you want to store data globally and persistently, you can easily integrate a cloud database such as Firebase, AWS DynamoDB, MongoDB Atlas, or deploy your own database on platforms like Render.  
+If you want to store data globally and persistently, you can easily integrate a cloud database such as Firebase, AWS DynamoDB, MongoDB Atlas, or deploy your own database on platforms like Render.
+Moreover, deployment on vercel for nextjs based web application will not work for socket.io hence I dont use it for deployment
+
 Instructions for integrating Firebase are provided below, but you can use any database solution that fits
 
 ---
